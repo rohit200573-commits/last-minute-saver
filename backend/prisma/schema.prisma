@@ -1,0 +1,163 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String               @id @default(uuid())
+  email              String               @unique
+  passwordHash       String?
+  name               String?
+  image              String?
+  
+  // Gamification
+  xp                 Int                  @default(0)
+  level              Int                  @default(1)
+  streak             Int                  @default(0)
+  
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  // Relations
+  tasks              Task[]
+  schedules          Schedule[]
+  focusSessions      FocusSession[]
+  productivityScores ProductivityScore[]
+  aiRecommendations  AIRecommendation[]
+  achievements       Achievement[]
+  notifications      Notification[]
+  calendars          Calendar[]
+  analytics          Analytics[]
+}
+
+model Task {
+  id          String     @id @default(uuid())
+  title       String
+  description String?
+  status      String     @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
+  priority    String     @default("MEDIUM")  // LOW, MEDIUM, HIGH, CRITICAL
+  userId      String
+  deadlineId  String?    @unique
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deadline    Deadline?  @relation(fields: [deadlineId], references: [id])
+  subTasks    SubTask[]
+}
+
+model SubTask {
+  id          String   @id @default(uuid())
+  title       String
+  isCompleted Boolean  @default(false)
+  taskId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model Schedule {
+  id        String   @id @default(uuid())
+  title     String
+  startTime DateTime
+  endTime   DateTime
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model FocusSession {
+  id          String   @id @default(uuid())
+  duration    Int      // Duration in minutes
+  isCompleted Boolean  @default(false)
+  userId      String
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ProductivityScore {
+  id        String   @id @default(uuid())
+  score     Float
+  date      DateTime @default(now())
+  userId    String
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AIRecommendation {
+  id        String   @id @default(uuid())
+  content   String
+  type      String   // e.g., TASK_BREAKDOWN, SCHEDULE_CHANGE, EMERGENCY
+  isApplied Boolean  @default(false)
+  userId    String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Badge {
+  id          String        @id @default(uuid())
+  name        String
+  description String
+  imageUrl    String?
+  
+  achievements Achievement[]
+}
+
+model Achievement {
+  id         String   @id @default(uuid())
+  userId     String
+  badgeId    String
+  unlockedAt DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge      Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  message   String
+  isRead    Boolean  @default(false)
+  type      String   // INFO, WARNING, CRITICAL
+  userId    String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Calendar {
+  id        String   @id @default(uuid())
+  provider  String   // e.g., GOOGLE, OUTLOOK
+  syncToken String?
+  userId    String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Deadline {
+  id        String   @id @default(uuid())
+  date      DateTime
+  isUrgent  Boolean  @default(false) // Trigger for Emergency Rescue Mode
+  createdAt DateTime @default(now())
+  
+  task      Task?
+}
+
+model Analytics {
+  id            String   @id @default(uuid())
+  metricName    String
+  metricValue   Float
+  timestamp     DateTime @default(now())
+  userId        String
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

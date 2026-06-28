@@ -6,9 +6,11 @@ interface StatsWidgetProps {
   xp: number;
   nextLevelXp: number;
   streak: number;
+  activeTasks?: number;
+  completedTasks?: number;
 }
 
-export default function StatsWidget({ level, xp, nextLevelXp, streak }: StatsWidgetProps) {
+export default function StatsWidget({ level, xp, nextLevelXp, streak, activeTasks = 0, completedTasks = 0 }: StatsWidgetProps) {
   const progress = Math.round((xp / nextLevelXp) * 100);
 
   return (
@@ -24,8 +26,12 @@ export default function StatsWidget({ level, xp, nextLevelXp, streak }: StatsWid
               </div>
             </div>
             <div>
-              <h3 className="text-zinc-400 font-medium mb-1 text-sm">Current Level</h3>
-              <div className="text-2xl font-bold text-white">Master Planner</div>
+              <h3 className="text-zinc-400 font-medium mb-1 text-sm">Level {level}</h3>
+              <div className="text-lg font-bold text-white flex gap-3">
+                <span><span className="text-primary">{activeTasks}</span> Active</span>
+                <span className="text-zinc-600">|</span>
+                <span><span className="text-accent">{completedTasks}</span> Done</span>
+              </div>
             </div>
           </div>
 

@@ -2,27 +2,36 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, X, Send, Bot } from 'lucide-react';
+import { MessageSquare, X, Send, Bot, Loader2 } from 'lucide-react';
+import { useAuth } from '@clerk/nextjs';
+import { fetchWithAuth } from '@/lib/api';
 
 export default function AIChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{role: 'user' | 'ai', text: string}[]>([
     { role: 'ai', text: 'Hi! I am your AI Copilot. How can I help you crush your deadlines today?' }
   ]);
-  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { getToken } = useAuth();
 
-  const handleSend = () => {
-    if (!input.trim()) return;
-    setMessages(prev => [...prev, { role: 'user', text: input }]);
+  const handleSend = async () => {
+    if (!input.trim() || loading) return;
+    const userMsg = input;
+    setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
     setInput('');
+    setLoading(true);
     
-    // Mock AI response
-    setTimeout(() => {
-      setMessages(prev => [...prev, { 
-        role: 'ai', 
-        text: 'I\'ve analyzed your schedule. You have a 94% probability of completing your tasks if you start the Q3 Report now. Want me to block out 2 hours on your calendar?' 
-      }]);
-    }, 1000);
+    try {
+      const data = await fetchWithAuth('/chat', getToken, {
+        method: 'POST',
+        body: JSON.stringify({ message: userMsg })
+      });
+      setMessages(prev => [...prev, { role: 'ai', text: data.text }]);
+    } catch (err) {
+      setMessages(prev => [...prev, { role: 'ai', text: 'Sorry, I am currently offline.' }]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -54,6 +63,13 @@ export default function AIChat() {
                   </div>
                 </div>
               ))}
+              {loading && (
+                <div className="flex justify-start">
+                  <div className="max-w-[85%] p-3 rounded-2xl bg-white/10 text-zinc-200 rounded-bl-none flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" /> Thinking...
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="p-4 border-t border-white/10 bg-black/50 flex gap-2">

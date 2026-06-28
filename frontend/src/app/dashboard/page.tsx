@@ -129,7 +129,11 @@ export default function Dashboard() {
         {/* We can wrap StatsWidget in a deep glass panel if it doesn't already have one, but we assume StatsWidget is self-contained. 
             We'll add a wrapper just in case. */}
         <div className="bg-white/[0.02] border border-white/10 backdrop-blur-3xl rounded-3xl p-2 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">
-          <StatsWidget {...user} />
+          <StatsWidget 
+            {...user} 
+            activeTasks={tasks.filter(t => t.status !== 'COMPLETED').length}
+            completedTasks={tasks.filter(t => t.status === 'COMPLETED').length}
+          />
         </div>
       </motion.div>
 
@@ -139,8 +143,11 @@ export default function Dashboard() {
             <h2 className="text-2xl font-bold text-white tracking-tight">Prioritized Timeline</h2>
             <div className="flex items-center gap-4">
               <CreateTaskModal onTaskCreated={() => {
-                // simple reload for now
-                window.location.reload();
+                const loadData = async () => {
+                  const tasksData = await fetchWithAuth('/tasks', getToken);
+                  setTasks(tasksData);
+                };
+                loadData();
               }} />
               <Link href="/tasks" className="text-sm px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 rounded-full text-white font-bold transition-all flex items-center gap-2">
                 View All <ArrowRight className="w-4 h-4" />
@@ -191,9 +198,9 @@ export default function Dashboard() {
                 <p className="text-base text-zinc-400 mb-8 leading-relaxed flex-1">
                   The predictive engine suggests a 45-minute deep work session to complete your critical task before fatigue sets in.
                 </p>
-                <button className="w-full py-4 bg-primary hover:bg-primary/90 text-white rounded-2xl font-bold transition-all shadow-[0_0_25px_rgba(109,93,252,0.4)] flex justify-center items-center gap-2 text-lg">
+                <Link href={`/focus?taskId=${urgentTask?.id || (tasks.length > 0 ? tasks[0].id : '')}`} className="w-full py-4 bg-primary hover:bg-primary/90 text-white rounded-2xl font-bold transition-all shadow-[0_0_25px_rgba(109,93,252,0.4)] flex justify-center items-center gap-2 text-lg">
                   <Play className="w-5 h-5 fill-current" /> Start Session
-                </button>
+                </Link>
               </div>
             </div>
           </Tilt>

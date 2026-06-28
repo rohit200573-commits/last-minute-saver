@@ -5,6 +5,7 @@ import { clerkMiddleware, requireAuth } from '@clerk/express';
 import userRoutes from './routes/userRoutes';
 import taskRoutes from './routes/taskRoutes';
 import gamificationRoutes from './routes/gamificationRoutes';
+import chatRoutes from './routes/chatRoutes';
 import rateLimit from 'express-rate-limit';
 
 dotenv.config();
@@ -49,6 +50,7 @@ app.use((req, res, next) => {
 app.use('/api/users', requireAuth(), userRoutes);
 app.use('/api/tasks', requireAuth(), taskRoutes);
 app.use('/api/gamification', requireAuth(), gamificationRoutes);
+app.use('/api/chat', requireAuth(), chatRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

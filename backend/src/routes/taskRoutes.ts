@@ -15,15 +15,21 @@ router.get('/', async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
     
-    // Lazy User Creation (if they don't exist yet)
-    await prisma.user.upsert({
-      where: { clerkId: userId },
-      update: {},
-      create: {
-        clerkId: userId,
-        email: `${userId}@placeholder.com`, // Temp email if not fetched from clerk
-      }
+    let user = await prisma.user.findUnique({
+      where: { clerkId: userId }
     });
+
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          clerkId: userId,
+          email: `${userId}@clerk.user`, // Still a placeholder, but better than generic
+          xp: 0,
+          level: 1,
+          streak: 0
+        }
+      });
+    }
 
     const tasks = await prisma.task.findMany({
       where: { user: { clerkId: userId } },
@@ -46,7 +52,8 @@ router.post('/', async (req: Request, res: Response) => {
     const taskSchema = z.object({
       title: z.string().min(1).max(255),
       description: z.string().optional(),
-      priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']).default('MEDIUM')
+      priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']).default('MEDIUM'),
+      deadline: z.string().optional()
     });
 
     const parsedBody = taskSchema.safeParse(req.body);
@@ -54,7 +61,7 @@ router.post('/', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid input', details: parsedBody.error });
     }
 
-    const { title, description, priority } = parsedBody.data;
+    const { title, description, priority, deadline } = parsedBody.data;
     
     // Get the internal DB user ID
     const user = await prisma.user.findUnique({
@@ -67,8 +74,8 @@ router.post('/', async (req: Request, res: Response) => {
 
     let subTasksToCreate: { title: string }[] = [];
 
-    // If the task title is relatively short/vague, auto-generate subtasks
-    if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'dummy' && title.length < 50) {
+    // If the task title is reasonably descriptive, auto-generate subtasks
+    if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'dummy' && title.length >= 10) {
       try {
         const prompt = `Break down the following task into 3 to 5 actionable subtasks. Return ONLY a valid JSON array of strings representing the subtask titles, and nothing else. Do not use markdown blocks. Task: "${title}". Description: "${description || 'None'}"`;
         
@@ -95,6 +102,12 @@ router.post('/', async (req: Request, res: Response) => {
         description,
         priority,
         userId: user.id,
+        deadline: deadline ? {
+          create: {
+            date: new Date(deadline),
+            isUrgent: priority === 'CRITICAL'
+          }
+        } : undefined,
         subTasks: subTasksToCreate.length > 0 ? {
           create: subTasksToCreate
         } : undefined
@@ -145,6 +158,22 @@ router.patch('/:id/status', async (req: Request, res: Response) => {
       data: { status },
       include: { subTasks: true, deadline: true }
     });
+
+    if (status === 'COMPLETED' && existingTask.status !== 'COMPLETED') {
+      const xpGained = 50;
+      const newXp = user.xp + xpGained;
+      const newLevel = Math.floor(newXp / 1000) + 1;
+      const newStreak = user.streak + 1;
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { 
+          xp: newXp,
+          level: newLevel,
+          streak: newStreak
+        }
+      });
+    }
 
     res.json(updatedTask);
   } catch (error) {

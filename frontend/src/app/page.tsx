@@ -68,9 +68,9 @@ export default function LandingPage() {
           <Link href="/dashboard" className="px-8 py-4 bg-white text-black hover:bg-zinc-200 rounded-full font-bold transition-all flex items-center justify-center gap-2 text-lg shadow-[0_0_40px_rgba(255,255,255,0.2)]">
             Get Started <ChevronRight className="w-5 h-5" />
           </Link>
-          <button className="px-8 py-4 bg-transparent border border-white/20 hover:bg-white/5 text-white rounded-full font-bold transition-all flex items-center justify-center gap-2 text-lg backdrop-blur-sm">
+          <Link href="/dashboard" className="px-8 py-4 bg-transparent border border-white/20 hover:bg-white/5 text-white rounded-full font-bold transition-all flex items-center justify-center gap-2 text-lg backdrop-blur-sm">
             Learn More
-          </button>
+          </Link>
         </motion.div>
       </section>
 
@@ -210,9 +210,9 @@ export default function LandingPage() {
           <Link href="/dashboard" className="px-8 py-3 bg-white text-black rounded-full font-bold hover:bg-zinc-200 transition-colors">
             Get Started
           </Link>
-          <button className="px-8 py-3 border border-white/20 rounded-full font-bold hover:bg-white/5 transition-colors">
+          <Link href="/dashboard" className="px-8 py-3 border border-white/20 rounded-full font-bold hover:bg-white/5 transition-colors">
             Learn More
-          </button>
+          </Link>
         </div>
         <div className="flex flex-col md:flex-row justify-between items-center max-w-7xl mx-auto text-zinc-500 text-sm">
           <div>© 2026 Last Minute Life Saver. All rights reserved.</div>

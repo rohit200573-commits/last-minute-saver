@@ -1,28 +1,30 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
+import { requireAuth, getAuth } from '@clerk/express';
 import prisma from '../prisma';
 
 const router = Router();
 
-// Get all users
-router.get('/', async (req, res) => {
+// Get current user profile and stats
+router.get('/me', async (req: Request, res: Response) => {
   try {
-    const users = await prisma.user.findMany();
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch users' });
-  }
-});
+    const { userId } = getAuth(req);
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
 
-// Create a user
-router.post('/', async (req, res) => {
-  try {
-    const { email, name } = req.body;
-    const user = await prisma.user.create({
-      data: { email, name }
+    // Lazy User Creation
+    const user = await prisma.user.upsert({
+      where: { clerkId: userId },
+      update: {},
+      create: {
+        clerkId: userId,
+        email: `${userId}@placeholder.com`, 
+      }
     });
-    res.status(201).json(user);
+
+    res.json(user);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create user' });
+    res.status(500).json({ error: 'Failed to fetch user profile' });
   }
 });
 

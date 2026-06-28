@@ -13,7 +13,7 @@ const TasksBackground3D = dynamic(() => import('@/components/TasksBackground3D')
 
 export default function LandingPage() {
   return (
-    <div className="relative min-h-screen bg-[#050505] text-white overflow-x-hidden">
+    <div className="relative min-h-screen bg-background text-white overflow-x-hidden">
       
       {/* 3D Background */}
       <Scene />
@@ -66,7 +66,7 @@ export default function LandingPage() {
         <motion.div 
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ margin: "-100px" }}
+          viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
@@ -81,7 +81,7 @@ export default function LandingPage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ margin: "-100px" }}
+          viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
           <Tilt>
@@ -160,7 +160,7 @@ export default function LandingPage() {
             <motion.div 
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ margin: "-100px" }}
+              viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.8 }}
             >
               <div className="text-primary font-bold tracking-widest text-sm mb-4">01. PREDICTIVE ANALYTICS</div>
@@ -175,7 +175,7 @@ export default function LandingPage() {
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ margin: "-100px" }}
+              viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.8 }}
               className="h-[400px] w-full relative rounded-3xl border border-white/10 bg-white/5 overflow-hidden"
             >
@@ -188,7 +188,7 @@ export default function LandingPage() {
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ margin: "-100px" }}
+              viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.8 }}
               className="h-[400px] w-full relative rounded-3xl border border-white/10 bg-white/5 overflow-hidden order-2 md:order-1"
             >
@@ -200,7 +200,7 @@ export default function LandingPage() {
             <motion.div 
               initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ margin: "-100px" }}
+              viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.8 }}
               className="order-1 md:order-2"
             >
@@ -220,7 +220,7 @@ export default function LandingPage() {
             <motion.div 
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ margin: "-100px" }}
+              viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.8 }}
             >
               <div className="text-cyan-400 font-bold tracking-widest text-sm mb-4">03. SMART SCHEDULING</div>
@@ -235,7 +235,7 @@ export default function LandingPage() {
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ margin: "-100px" }}
+              viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.8 }}
               className="h-[400px] w-full relative rounded-3xl border border-white/10 bg-white/5 overflow-hidden flex items-center justify-center"
             >

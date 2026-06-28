@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Home, CheckSquare, TrendingUp, User, LayoutDashboard, ShieldAlert } from 'lucide-react';
+import { Home, CheckSquare, TrendingUp, LayoutDashboard, ShieldAlert, LogIn } from 'lucide-react';
+import { SignInButton, Show, UserButton } from '@clerk/nextjs';
 
 export default function Navbar() {
   return (
@@ -28,20 +29,37 @@ export default function Navbar() {
           <TrendingUp className="w-6 h-6 md:w-5 md:h-5" />
           <span className="text-[10px] md:text-sm font-medium">Analytics</span>
         </Link>
-        <Link href="#" className="flex flex-col items-center gap-1 text-zinc-500 hover:text-primary transition-colors md:hidden">
-          <User className="w-6 h-6 md:w-5 md:h-5" />
-          <span className="text-[10px] md:text-sm font-medium">Profile</span>
-        </Link>
+        <Show when="signed-out">
+          <SignInButton mode="modal">
+            <button className="flex flex-col items-center gap-1 text-zinc-500 hover:text-primary transition-colors md:hidden bg-transparent border-none p-0 cursor-pointer">
+              <LogIn className="w-6 h-6" />
+              <span className="text-[10px] font-medium">Log In</span>
+            </button>
+          </SignInButton>
+        </Show>
+        <Show when="signed-in">
+          <div className="md:hidden flex flex-col items-center justify-center">
+            <UserButton appearance={{ elements: { userButtonAvatarBox: "w-6 h-6" } }} />
+            <span className="text-[10px] font-medium text-zinc-500 mt-1">Profile</span>
+          </div>
+        </Show>
       </div>
 
-      <div className="hidden md:flex items-center gap-3">
-        <div className="flex flex-col items-end">
-          <span className="text-sm font-semibold text-zinc-900 dark:text-white">Level 12</span>
-          <span className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">350 / 500 XP</span>
-        </div>
-        <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
-          <User className="w-6 h-6 text-zinc-500" />
-        </div>
+      <div className="hidden md:flex items-center gap-4">
+        <Show when="signed-in">
+          <div className="flex flex-col items-end">
+            <span className="text-sm font-semibold text-zinc-900 dark:text-white">Level 12</span>
+            <span className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">350 / 500 XP</span>
+          </div>
+          <UserButton appearance={{ elements: { userButtonAvatarBox: "w-10 h-10" } }} />
+        </Show>
+        <Show when="signed-out">
+          <SignInButton mode="modal">
+            <button className="bg-primary hover:bg-primary/90 text-white px-5 py-2 rounded-full font-medium text-sm transition-all shadow-[0_0_15px_rgba(34,211,238,0.3)]">
+              Sign In
+            </button>
+          </SignInButton>
+        </Show>
       </div>
     </nav>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Float, Environment, Stars, PerspectiveCamera, Sparkles, Grid } from '@react-three/drei';
 import * as THREE from 'three';
@@ -104,6 +104,7 @@ function OrbitingTasks() {
 }
 
 const vertexShader = `
+precision mediump float;
 uniform float uTime;
 uniform vec2 uMouse;
 uniform float uMouseDown;
@@ -139,7 +140,8 @@ void main() {
   swirlPos.y += sin(uTime * 2.0 + aRandom * 100.0) * 0.5;
 
   vec4 mvPosition = modelViewMatrix * vec4(swirlPos, 1.0);
-  gl_PointSize = (10.0 * aRandom + 2.0) * (10.0 / -mvPosition.z);
+  // Prevent divide by zero or extreme sizes which can crash WebGL drivers
+  gl_PointSize = (10.0 * aRandom + 2.0) * (10.0 / max(0.1, -mvPosition.z));
   gl_Position = projectionMatrix * mvPosition;
   
   vAlpha = 0.5 + 0.5 * sin(uTime + aRandom * 10.0);
@@ -147,6 +149,7 @@ void main() {
 `;
 
 const fragmentShader = `
+precision mediump float;
 uniform vec3 uColor;
 varying float vAlpha;
 
@@ -241,39 +244,41 @@ function Rig() {
 
 export default function Scene() {
   return (
-    <div className="absolute inset-0 z-0">
+    <div className="fixed inset-0 z-0 w-full h-[100vh]">
       <Canvas>
-        <PerspectiveCamera makeDefault position={[0, 0, 8]} fov={50} />
-        <color attach="background" args={['#050505']} />
-        
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[10, 10, 5]} intensity={2} color="#6D5DFC" />
-        <directionalLight position={[-10, -10, -5]} intensity={1} color="#00D4FF" />
-        <pointLight position={[0, 0, 0]} intensity={2} color="#7CFF6B" distance={5} />
-        
-        <Stars radius={100} depth={50} count={8000} factor={4} saturation={0} fade speed={1} />
-        
-        {/* Interactive Swarm Particles (GPU Accelerated) */}
-        <GPUParticles count={15000} color="#00D4FF" />
-        
-        {/* Futuristic glowing grid floor */}
-        <Grid 
-          position={[0, -4, 0]} 
-          args={[30, 30]} 
-          cellSize={1} 
-          cellThickness={1} 
-          cellColor="#6D5DFC" 
-          sectionSize={3} 
-          sectionThickness={1.5} 
-          sectionColor="#00D4FF" 
-          fadeDistance={20} 
-        />
-        
-        <FloatingCore />
-        <OrbitingTasks />
-        <Rig />
-        
-        <Environment preset="city" />
+        <Suspense fallback={null}>
+          <PerspectiveCamera makeDefault position={[0, 0, 8]} fov={50} />
+          <color attach="background" args={['#050505']} />
+          
+          <ambientLight intensity={0.5} />
+          <directionalLight position={[10, 10, 5]} intensity={2} color="#6D5DFC" />
+          <directionalLight position={[-10, -10, -5]} intensity={1} color="#00D4FF" />
+          <pointLight position={[0, 0, 0]} intensity={2} color="#7CFF6B" distance={5} />
+          
+          <Stars radius={100} depth={50} count={8000} factor={4} saturation={0} fade speed={1} />
+          
+          {/* Interactive Swarm Particles (GPU Accelerated) */}
+          <GPUParticles count={15000} color="#00D4FF" />
+          
+          {/* Futuristic glowing grid floor */}
+          <Grid 
+            position={[0, -4, 0]} 
+            args={[30, 30]} 
+            cellSize={1} 
+            cellThickness={1} 
+            cellColor="#6D5DFC" 
+            sectionSize={3} 
+            sectionThickness={1.5} 
+            sectionColor="#00D4FF" 
+            fadeDistance={20} 
+          />
+          
+          <FloatingCore />
+          <OrbitingTasks />
+          <Rig />
+          
+          <Environment preset="city" />
+        </Suspense>
       </Canvas>
     </div>
   );

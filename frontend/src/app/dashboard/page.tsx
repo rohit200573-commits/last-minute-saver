@@ -7,6 +7,7 @@ import { ArrowRight, Play, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import Tilt from '@/components/Tilt';
+import CreateTaskModal from '@/components/CreateTaskModal';
 
 const FocusCoach3D = dynamic(() => import('@/components/FocusCoach3D'), { ssr: false });
 
@@ -23,19 +24,40 @@ const item = {
   show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
 };
 
-export default function Dashboard() {
-  const mockUser = {
-    level: 12,
-    xp: 350,
-    nextLevelXp: 500,
-    streak: 14
-  };
+import { useState, useEffect } from 'react';
+import { useAuth } from '@clerk/nextjs';
+import { fetchWithAuth } from '@/lib/api';
 
-  const mockTasks: Array<{id: string, title: string, priority: 'HIGH' | 'MEDIUM' | 'LOW' | 'CRITICAL', status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED'}> = [
-    { id: '1', title: 'Finish Q3 Report', priority: 'CRITICAL', status: 'IN_PROGRESS' },
-    { id: '2', title: 'Review PRs', priority: 'MEDIUM', status: 'PENDING' },
-    { id: '3', title: 'Update dependencies', priority: 'LOW', status: 'COMPLETED' },
-  ];
+export default function Dashboard() {
+  const { getToken } = useAuth();
+  const [user, setUser] = useState({ level: 1, xp: 0, nextLevelXp: 100, streak: 0 });
+  const [tasks, setTasks] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [userData, tasksData] = await Promise.all([
+          fetchWithAuth('/users/me', getToken),
+          fetchWithAuth('/tasks', getToken)
+        ]);
+        
+        setUser({
+          level: userData.level || 1,
+          xp: userData.xp || 0,
+          nextLevelXp: (userData.level || 1) * 100, // simple calc
+          streak: userData.streak || 0
+        });
+        setTasks(tasksData);
+      } catch (err) {
+        console.error('Failed to load dashboard data:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    loadData();
+  }, [getToken]);
 
   return (
     <motion.div 
@@ -67,7 +89,7 @@ export default function Dashboard() {
         {/* We can wrap StatsWidget in a deep glass panel if it doesn't already have one, but we assume StatsWidget is self-contained. 
             We'll add a wrapper just in case. */}
         <div className="bg-white/[0.02] border border-white/10 backdrop-blur-3xl rounded-3xl p-2 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">
-          <StatsWidget {...mockUser} />
+          <StatsWidget {...user} />
         </div>
       </motion.div>
 
@@ -75,19 +97,31 @@ export default function Dashboard() {
         <div className="md:col-span-2 space-y-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-white tracking-tight">Prioritized Timeline</h2>
-            <Link href="/tasks" className="text-sm px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 rounded-full text-white font-bold transition-all flex items-center gap-2">
-              View All <ArrowRight className="w-4 h-4" />
-            </Link>
+            <div className="flex items-center gap-4">
+              <CreateTaskModal onTaskCreated={() => {
+                // simple reload for now
+                window.location.reload();
+              }} />
+              <Link href="/tasks" className="text-sm px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 rounded-full text-white font-bold transition-all flex items-center gap-2">
+                View All <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
           
           <div className="space-y-4">
-            {mockTasks.map(task => (
-              <motion.div key={task.id} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
-                <div className="bg-white/[0.02] border border-white/10 backdrop-blur-3xl rounded-3xl overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
-                  <TaskCard {...task} />
-                </div>
-              </motion.div>
-            ))}
+            {loading ? (
+              <div className="text-white">Loading tasks...</div>
+            ) : tasks.length === 0 ? (
+              <div className="text-zinc-400">No tasks yet. Create one!</div>
+            ) : (
+              tasks.map((task: any) => (
+                <motion.div key={task.id} variants={item} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                  <div className="bg-white/[0.02] border border-white/10 backdrop-blur-3xl rounded-3xl overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
+                    <TaskCard {...task} />
+                  </div>
+                </motion.div>
+              ))
+            )}
           </div>
         </div>
 

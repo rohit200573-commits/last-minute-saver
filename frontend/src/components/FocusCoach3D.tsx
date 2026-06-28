@@ -1,51 +1,46 @@
 'use client';
 
-import { useRef } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, Environment } from '@react-three/drei';
-import * as THREE from 'three';
-
-function Brain() {
-  const meshRef = useRef<THREE.Mesh>(null);
-  
-  useFrame((state, delta) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y += delta * 0.5;
-      meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime) * 0.2;
-    }
-  });
-
-  return (
-    <Float speed={3} rotationIntensity={0.5} floatIntensity={2}>
-      <mesh ref={meshRef}>
-        <torusKnotGeometry args={[1, 0.3, 128, 32]} />
-        <meshPhysicalMaterial 
-          color="#7CFF6B" 
-          metalness={0.9} 
-          roughness={0.1} 
-          transmission={0.5} 
-          thickness={0.5}
-          emissive="#7CFF6B"
-          emissiveIntensity={0.5}
-          clearcoat={1}
-        />
-      </mesh>
-    </Float>
-  );
-}
+import { motion } from 'framer-motion';
+import { Brain, CheckCircle2, Clock } from 'lucide-react';
 
 export default function FocusCoach3D() {
   return (
-    <div className="w-full h-40 relative z-0">
-      <Canvas camera={{ position: [0, 0, 4], fov: 50 }}>
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[5, 5, 5]} intensity={1} color="#6D5DFC" />
-        <directionalLight position={[-5, -5, -5]} intensity={0.5} color="#00D4FF" />
-        
-        <Brain />
-        
-        <Environment preset="city" />
-      </Canvas>
+    <div className="w-full h-full relative flex items-center justify-center p-8 bg-gradient-to-tr from-black to-zinc-900/40">
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:16px_16px] opacity-30" />
+      
+      {/* Central Brain Core */}
+      <div className="relative w-40 h-40">
+        <motion.div 
+          animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute inset-0 rounded-[2rem] border-2 border-accent/40 bg-accent/10 backdrop-blur-sm flex items-center justify-center shadow-[0_0_40px_rgba(124,255,107,0.2)]"
+        >
+          <Brain className="w-16 h-16 text-accent" />
+        </motion.div>
+
+        {/* Orbiting Task nodes */}
+        <motion.div 
+          animate={{ rotate: 360 }}
+          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+          className="absolute -inset-12 origin-center"
+        >
+          <motion.div 
+            animate={{ rotate: -360 }}
+            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-10 bg-black border border-white/20 rounded-xl flex items-center justify-center"
+          >
+            <CheckCircle2 className="w-5 h-5 text-green-400" />
+          </motion.div>
+          
+          <motion.div 
+            animate={{ rotate: -360 }}
+            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+            className="absolute bottom-4 right-2 w-10 h-10 bg-black border border-white/20 rounded-xl flex items-center justify-center"
+          >
+            <Clock className="w-5 h-5 text-warning" />
+          </motion.div>
+        </motion.div>
+      </div>
     </div>
   );
 }

@@ -1,14 +1,29 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
+import { requireAuth, getAuth } from '@clerk/express';
 import prisma from '../prisma';
 
 const router = Router();
 
-// Get tasks for a user
-router.get('/:userId', async (req, res) => {
+// Get tasks for the authenticated user
+router.get('/', async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params;
+    const { userId } = getAuth(req);
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
+    // Lazy User Creation (if they don't exist yet)
+    await prisma.user.upsert({
+      where: { clerkId: userId },
+      update: {},
+      create: {
+        clerkId: userId,
+        email: `${userId}@placeholder.com`, // Temp email if not fetched from clerk
+      }
+    });
+
     const tasks = await prisma.task.findMany({
-      where: { userId },
+      where: { user: { clerkId: userId } },
       include: { subTasks: true }
     });
     res.json(tasks);
@@ -18,15 +33,30 @@ router.get('/:userId', async (req, res) => {
 });
 
 // Create a task
-router.post('/', async (req, res) => {
+router.post('/', async (req: Request, res: Response) => {
   try {
-    const { title, description, priority, userId } = req.body;
+    const { userId } = getAuth(req);
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { title, description, priority } = req.body;
+    
+    // Get the internal DB user ID
+    const user = await prisma.user.findUnique({
+      where: { clerkId: userId }
+    });
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
     const task = await prisma.task.create({
       data: {
         title,
         description,
         priority,
-        userId
+        userId: user.id
       }
     });
     res.status(201).json(task);

@@ -16,9 +16,11 @@ const geistMono = Geist_Mono({
 
 import AIChat from '@/components/AIChat';
 
+import { ClerkProvider } from '@clerk/nextjs'
+
 export const metadata: Metadata = {
   title: "Last Minute Life Saver",
-  description: "AI Productivity Copilot",
+  description: "Mathematically prevent procrastination.",
 };
 
 export default function RootLayout({
@@ -27,20 +29,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      suppressHydrationWarning
-    >
-      <body className="flex flex-col text-white min-h-screen" style={{ backgroundColor: '#050505' }}>
-        <SmoothScroll>
-          <Navbar />
-          <main className="flex-1 pb-16 md:pb-0 relative z-10">
-            {children}
-          </main>
-          <AIChat />
-        </SmoothScroll>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html
+        lang="en"
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
+      >
+        <body className="flex flex-col text-foreground bg-background min-h-screen" suppressHydrationWarning>
+          <SmoothScroll>
+            <Navbar />
+            <main className="flex-1 pb-16 md:pb-0 relative z-10">
+              {children}
+            </main>
+            <AIChat />
+          </SmoothScroll>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

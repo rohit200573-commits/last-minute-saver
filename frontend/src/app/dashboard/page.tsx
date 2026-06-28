@@ -59,6 +59,28 @@ export default function Dashboard() {
     loadData();
   }, [getToken]);
 
+  const handleStatusChange = async (id: string, newStatus: string) => {
+    try {
+      // Optimistic update
+      setTasks(current => current.map(t => t.id === id ? { ...t, status: newStatus } : t));
+      await fetchWithAuth(`/tasks/${id}/status`, getToken, {
+        method: 'PATCH',
+        body: JSON.stringify({ status: newStatus })
+      });
+    } catch (err) {
+      console.error('Failed to update status', err);
+      // Revert on failure by reloading
+      const tasksData = await fetchWithAuth('/tasks', getToken);
+      setTasks(tasksData);
+    }
+  };
+
+  const urgentTask = tasks.find(task => {
+    if (!task.deadline?.date) return false;
+    const timeDiff = new Date(task.deadline.date).getTime() - new Date().getTime();
+    return timeDiff > 0 && timeDiff <= 24 * 60 * 60 * 1000;
+  });
+
   return (
     <motion.div 
       variants={container}
@@ -67,16 +89,26 @@ export default function Dashboard() {
       className="max-w-6xl mx-auto p-6 md:p-10 space-y-10"
     >
       {/* Emergency Rescue Mode Alert */}
-      <motion.div variants={item} className="relative overflow-hidden bg-danger/10 border border-danger/30 backdrop-blur-2xl rounded-3xl p-6 flex items-start gap-4 shadow-[0_0_40px_rgba(255,82,82,0.2)] animate-pulse">
-        <div className="absolute inset-0 bg-gradient-to-r from-danger/10 to-transparent opacity-50"></div>
-        <div className="p-3 bg-danger/20 rounded-2xl text-danger border border-danger/30 relative z-10 shadow-[0_0_20px_rgba(255,82,82,0.4)]">
-          <AlertTriangle className="w-8 h-8" />
-        </div>
-        <div className="relative z-10">
-          <h3 className="font-bold text-danger text-xl tracking-tight mb-1">Emergency Rescue Mode Activated</h3>
-          <p className="text-zinc-300 text-base leading-relaxed">"Finish Q3 Report" is due in less than 24 hours. The AI has restructured your schedule and recommends entering Focus Mode immediately.</p>
-        </div>
-      </motion.div>
+      {urgentTask && (
+        <motion.div variants={item} className="relative overflow-hidden bg-danger/10 border border-danger/30 backdrop-blur-2xl rounded-3xl p-6 flex items-start gap-4 shadow-[0_0_40px_rgba(255,82,82,0.2)] animate-pulse">
+          <div className="absolute inset-0 bg-gradient-to-r from-danger/10 to-transparent opacity-50"></div>
+          <div className="p-3 bg-danger/20 rounded-2xl text-danger border border-danger/30 relative z-10 shadow-[0_0_20px_rgba(255,82,82,0.4)]">
+            <AlertTriangle className="w-8 h-8" />
+          </div>
+          <div className="relative z-10 flex-1">
+            <h3 className="font-bold text-danger text-xl tracking-tight mb-1">Emergency Rescue Mode Activated</h3>
+            <p className="text-zinc-300 text-base leading-relaxed mb-4">"{urgentTask.title}" is due in less than 24 hours. The AI has restructured your schedule and recommends entering Focus Mode immediately.</p>
+            <div className="flex gap-3">
+              <Link href="/rescue" className="px-4 py-2 bg-danger text-white rounded-lg font-bold text-sm shadow-[0_0_15px_rgba(255,82,82,0.4)]">
+                Enter Rescue Mode
+              </Link>
+              <Link href={`/focus?taskId=${urgentTask.id}`} className="px-4 py-2 border border-danger/30 text-danger hover:bg-danger/10 rounded-lg font-bold text-sm transition-colors">
+                Start Focus Session
+              </Link>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       <motion.header variants={item} className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
@@ -111,16 +143,26 @@ export default function Dashboard() {
           <div className="space-y-4">
             {loading ? (
               <div className="text-white">Loading tasks...</div>
-            ) : tasks.length === 0 ? (
-              <div className="text-zinc-400">No tasks yet. Create one!</div>
             ) : (
-              tasks.map((task: any) => (
-                <motion.div key={task.id} variants={item} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
-                  <div className="bg-white/[0.02] border border-white/10 backdrop-blur-3xl rounded-3xl overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
-                    <TaskCard {...task} />
+              <div className="flex-1 space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar pb-10">
+              {tasks.length === 0 && !loading ? (
+                <div className="flex flex-col items-center justify-center p-12 text-center bg-white/[0.02] border border-white/5 rounded-3xl backdrop-blur-sm">
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border border-primary/20">
+                    <Sparkles className="w-8 h-8 text-primary" />
                   </div>
-                </motion.div>
-              ))
+                  <h3 className="text-xl font-bold text-white mb-2">You're all caught up!</h3>
+                  <p className="text-zinc-400 mb-6 max-w-sm">There are no pending tasks in your queue. Take a break, or add a new task to stay productive.</p>
+                </div>
+              ) : (
+                tasks.map((task: any) => (
+                  <motion.div key={task.id} variants={item} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                    <div className="bg-white/[0.02] border border-white/10 backdrop-blur-3xl rounded-3xl overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
+                      <TaskCard {...task} onStatusChange={handleStatusChange} />
+                    </div>
+                  </motion.div>
+                ))
+              )}
+            </div>
             )}
           </div>
         </div>

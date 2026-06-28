@@ -1,66 +1,71 @@
-# Last Minute Life Saver 🌌
+# Last Minute Life Saver 🦸‍♂️⏱️
 
-> **The future of productivity is here.**
-> A full-stack AI platform that mathematically prevents procrastination and eliminates missed deadlines through Predictive Digital Twins.
+> *The AI-powered productivity app that turns procrastination into gamified execution.*
 
-## 🧠 The Unique IP: Predictive Digital Twin
-Most productivity apps act as passive storage for your tasks. **Last Minute Life Saver** acts as an active, predictive engine.
+![Hero Image](https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80)
 
-The core Intellectual Property lies in our **Predictive Digital Twin Engine**:
-1. **Historical Analysis**: The system analyzes your past completion rates, the time of day you work best, and the types of tasks you typically procrastinate on.
-2. **Procrastination Probability Matrix (PPM)**: For every new task entered, the AI calculates a mathematical probability of failure based on the deadline and your historical behavior.
-3. **Emergency Rescue Mode**: When a task's failure probability exceeds a critical threshold (e.g., < 24 hours remaining with high historical procrastination), the system automatically locks out low-priority tasks, triggers an aggressive AI breakdown of the task into 15-minute micro-steps, and enforces a "Focus Session" environment.
+## Features
 
-## 🚀 Key Features
-- **3D Immersive Interfaces**: High-performance, WebGL-accelerated interactive particle systems built with `@react-three/fiber` that react to your mouse and completion metrics.
-- **Glassmorphism Aesthetic**: Deep, beautiful UI built with Tailwind CSS v4 featuring backdrops, pulsing glows, and dynamic elements.
-- **AI Task Breakdown**: OpenAI integration that automatically estimates times and dependencies for vague user inputs.
-- **Gamified Progression**: Earn XP, build streaks, and unlock achievements for maintaining deep work hours.
+- **Procrastination Probability Matrix**: Real-time evaluation of how likely you are to procrastinate a task based on its creation date and approaching deadline.
+- **Emergency Rescue Mode**: A distraction-free environment that locks you in when a deadline is under 24 hours away.
+- **AI Subtask Generation**: Powered by **Google Gemini 2.5 Flash**, the app automatically breaks down vague or overwhelming tasks into 3-5 actionable subtasks.
+- **Focus Timer (Pomodoro)**: A beautiful, built-in Deep Work session timer that grants you XP upon completion.
+- **Gamified Productivity**: Gain XP, level up, and build streaks by completing tasks and focus sessions.
+- **Immersive 3D UI**: Built with Framer Motion and Three.js (React Three Fiber) for a futuristic, smooth, and interactive digital twin aesthetic.
 
-## 💻 Tech Stack
-- **Frontend**: Next.js 16 (App Router), React 19, Tailwind CSS v4, Framer Motion, Three.js, React Three Fiber.
-- **Backend**: Node.js, Express, TypeScript, Prisma ORM.
-- **Database**: PostgreSQL (currently configured locally).
-- **AI**: OpenAI API / LLM Integrations for task breakdown and prediction.
+## Tech Stack
 
-## 🛠️ Local Setup Instructions
+- **Frontend**: Next.js 14, React, Tailwind CSS, Framer Motion, React Three Fiber, Lucide Icons.
+- **Backend**: Node.js, Express, Prisma, PostgreSQL (Supabase ready).
+- **Authentication**: Clerk.
+- **AI Integration**: `@google/genai` (Gemini).
+
+## Live Demo
+Check out the live deployment here: **[Live Demo on Vercel](#)** *(Replace with your Vercel URL)*
+
+## Getting Started
 
 ### Prerequisites
 - Node.js (v18+)
-- PostgreSQL installed and running locally
-- Git
+- Postgres Database (or Supabase account)
+- Clerk Account (for auth)
+- Gemini API Key
 
-### 1. Database Setup
-Ensure PostgreSQL is running. The default local database URL is configured in the backend `.env`.
+### Installation
 
-### 2. Backend Initialization
-```bash
-cd backend
-npm install
-# Set up your environment variables
-cp .env.example .env
-# Apply the database schema
-npx prisma db push
-# Start the backend development server (Runs on port 3001)
-npm run dev
-```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/your-username/last-minute-saver.git
+   cd last-minute-saver
+   ```
 
-### 3. Frontend Initialization
-```bash
-cd frontend
-npm install
-# Start the frontend development server (Runs on port 3000)
-npm run dev
-```
+2. **Setup Frontend:**
+   ```bash
+   cd frontend
+   npm install
+   # Create a .env.local file using the variables in the root .env.example
+   npm run dev
+   ```
 
-### 4. Open Application
-Navigate to [http://localhost:3000](http://localhost:3000) to view the application!
+3. **Setup Backend:**
+   Open a new terminal window:
+   ```bash
+   cd backend
+   npm install
+   # Create a .env file using the variables in the root .env.example
+   # Add your GEMINI_API_KEY and Supabase DATABASE_URL
+   npx prisma db push
+   npm run dev
+   ```
 
-## 🧪 Testing (Coming Soon)
-- The backend API is tested using `Jest` and `Supertest`.
-- The frontend components are tested using `React Testing Library`.
+4. **Open the App:**
+   Navigate to `http://localhost:3000` in your browser.
 
-## 🚢 Deployment Architecture
-- **Frontend Edge**: Deployed globally via Vercel for instant TTFB.
-- **Backend API**: Containerized via Docker and deployed on Render/Railway.
-- **Database**: Managed PostgreSQL.
+## Deployment
+
+This app is production-ready for **Vercel** (frontend) and **Render** (backend).
+- **Frontend**: Connect your repository to Vercel and set the Root Directory to `frontend`.
+- **Backend**: A `render.yaml` Blueprint is included in the root folder. You can deploy it instantly on Render by creating a New Blueprint Instance.
+
+---
+*Built with ❤️ and AI.*

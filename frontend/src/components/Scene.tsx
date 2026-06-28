@@ -165,7 +165,7 @@ void main() {
 }
 `;
 
-function GPUParticles({ count = 15000, color = "#00D4FF" }) {
+function GPUParticles({ count = 5000, color = "#00D4FF" }) {
   const meshRef = useRef<THREE.Points>(null);
   const materialRef = useRef<THREE.ShaderMaterial>(null);
   const isMouseDown = useRef(false);
@@ -255,10 +255,10 @@ export default function Scene() {
           <directionalLight position={[-10, -10, -5]} intensity={1} color="#00D4FF" />
           <pointLight position={[0, 0, 0]} intensity={2} color="#7CFF6B" distance={5} />
           
-          <Stars radius={100} depth={50} count={8000} factor={4} saturation={0} fade speed={1} />
+          <Stars radius={100} depth={50} count={3000} factor={4} saturation={0} fade speed={1} />
           
           {/* Interactive Swarm Particles (GPU Accelerated) */}
-          <GPUParticles count={15000} color="#00D4FF" />
+          <GPUParticles count={5000} color="#00D4FF" />
           
           {/* Futuristic glowing grid floor */}
           <Grid 

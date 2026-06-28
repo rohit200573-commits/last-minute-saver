@@ -5,6 +5,7 @@ import { clerkMiddleware, requireAuth } from '@clerk/express';
 import userRoutes from './routes/userRoutes';
 import taskRoutes from './routes/taskRoutes';
 import gamificationRoutes from './routes/gamificationRoutes';
+import rateLimit from 'express-rate-limit';
 
 dotenv.config();
 
@@ -12,7 +13,27 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 // Middleware
-app.use(cors());
+const allowedOrigins = process.env.NODE_ENV === 'production' 
+  ? ['https://your-production-url.vercel.app'] 
+  : ['http://localhost:3000', 'http://localhost:3002'];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+});
+
+app.use(limiter);
 app.use(express.json());
 app.use(clerkMiddleware());
 

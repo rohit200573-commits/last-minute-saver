@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { getAuth } from '@clerk/express';
 import prisma from '../prisma';
+import { z } from 'zod';
 
 const router = Router();
 
@@ -35,8 +36,16 @@ router.post('/focus-session', async (req: Request, res: Response) => {
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
+    const focusSessionSchema = z.object({
+      duration: z.number().int().positive()
+    });
+
+    const parsedBody = focusSessionSchema.safeParse(req.body);
+    if (!parsedBody.success) {
+      return res.status(400).json({ error: 'Invalid input', details: parsedBody.error });
+    }
     
-    const { duration } = req.body;
+    const { duration } = parsedBody.data;
     
     const user = await prisma.user.findUnique({
       where: { clerkId: userId }

@@ -11,12 +11,25 @@ const FocusCoach3D = dynamic(() => import('@/components/FocusCoach3D'), { ssr: f
 const ProductivityTwin3D = dynamic(() => import('@/components/ProductivityTwin3D'), { ssr: false });
 const TasksBackground3D = dynamic(() => import('@/components/TasksBackground3D'), { ssr: false });
 
+import { useState, useEffect } from 'react';
+
 export default function LandingPage() {
+  const [isMobile, setIsMobile] = useState(true);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   return (
     <div className="relative min-h-screen bg-background text-white overflow-x-hidden">
       
-      {/* 3D Background */}
-      <Scene />
+      {/* 3D Background - Disabled on mobile for performance */}
+      {!isMobile && <Scene />}
 
       {/* Vertical Animated Grid Ribbons (Hero Background) */}
       <div className="absolute inset-0 z-0 pointer-events-none flex justify-center opacity-20">
@@ -61,95 +74,7 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      {/* Solutions Showcase (Mockup) */}
-      <section className="relative z-10 py-32 px-6 max-w-7xl mx-auto">
-        <motion.div 
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16"
-        >
-          <div className="text-cyan-400 font-bold tracking-widest text-sm mb-4 uppercase">Solutions</div>
-          <h2 className="text-4xl md:text-6xl font-bold mb-6">Revolutionize your workflows.</h2>
-          <p className="text-zinc-400 text-lg md:text-xl max-w-3xl mx-auto">
-            Our AI solutions automate complex task planning, reduce procrastination, and enhance strategic focus across your entire life.
-          </p>
-        </motion.div>
 
-        {/* Dashboard Glassmorphic Graphic */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          <Tilt>
-            <div className="relative rounded-3xl border border-white/10 bg-white/[0.02] backdrop-blur-3xl p-2 md:p-8 overflow-hidden shadow-[0_0_100px_rgba(109,93,252,0.1)]">
-              {/* Fake UI Header */}
-              <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-8">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
-                    <Brain className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-zinc-400">Total Productivity Score</div>
-                    <div className="text-2xl font-bold">9,842 XP <span className="text-sm text-green-400">+14.2%</span></div>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-danger"></div>
-                  <div className="w-3 h-3 rounded-full bg-accent"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                </div>
-              </div>
-              
-              {/* Fake UI Content */}
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="md:col-span-2 space-y-4">
-                  <div className="h-40 rounded-2xl bg-gradient-to-r from-primary/10 to-transparent border border-primary/20 flex items-end p-4">
-                    {/* Fake Chart bars */}
-                    <div className="w-full flex items-end justify-between gap-2 h-full pt-8">
-                      {[40, 60, 30, 80, 50, 90, 70, 100].map((h, i) => (
-                        <motion.div 
-                          key={i} 
-                          initial={{ height: 0 }}
-                          whileInView={{ height: `${h}%` }}
-                          transition={{ duration: 1, delay: i * 0.1 }}
-                          className="w-full bg-primary/40 rounded-t-sm"
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
-                      <div className="text-sm text-zinc-400 mb-1">Active Tasks</div>
-                      <div className="text-xl font-bold">14</div>
-                    </div>
-                    <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
-                      <div className="text-sm text-zinc-400 mb-1">Deep Work Hours</div>
-                      <div className="text-xl font-bold">32.5h</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="p-6 rounded-2xl bg-gradient-to-b from-secondary/10 to-transparent border border-secondary/20 h-full">
-                    <div className="text-sm text-secondary font-bold mb-4 flex items-center gap-2">
-                      <Zap className="w-4 h-4" /> AI INSIGHT
-                    </div>
-                    <p className="text-sm text-zinc-300 leading-relaxed">
-                      You are highly productive on Tuesday mornings. We have automatically rescheduled your heavy coding tasks to align with your peak focus windows.
-                    </p>
-                    <button className="w-full mt-6 py-2 rounded-lg bg-secondary/20 text-secondary text-sm font-bold border border-secondary/30">
-                      Apply Schedule
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Tilt>
-        </motion.div>
-      </section>
 
       {/* Alternating Features Section */}
       <section className="relative z-10 py-32 overflow-hidden bg-black/40">

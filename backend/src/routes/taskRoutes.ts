@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { requireAuth, getAuth } from '@clerk/express';
 import { GoogleGenAI } from '@google/genai';
 import prisma from '../prisma';
+import { z } from 'zod';
 
 const router = Router();
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || 'dummy' });
@@ -42,7 +43,18 @@ router.post('/', async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const { title, description, priority } = req.body;
+    const taskSchema = z.object({
+      title: z.string().min(1).max(255),
+      description: z.string().optional(),
+      priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']).default('MEDIUM')
+    });
+
+    const parsedBody = taskSchema.safeParse(req.body);
+    if (!parsedBody.success) {
+      return res.status(400).json({ error: 'Invalid input', details: parsedBody.error });
+    }
+
+    const { title, description, priority } = parsedBody.data;
     
     // Get the internal DB user ID
     const user = await prisma.user.findUnique({
@@ -104,7 +116,17 @@ router.patch('/:id/status', async (req: Request, res: Response) => {
     }
 
     const { id } = req.params;
-    const { status } = req.body;
+    
+    const statusSchema = z.object({
+      status: z.enum(['PENDING', 'IN_PROGRESS', 'COMPLETED'])
+    });
+    
+    const parsedBody = statusSchema.safeParse(req.body);
+    if (!parsedBody.success) {
+      return res.status(400).json({ error: 'Invalid input', details: parsedBody.error });
+    }
+    
+    const { status } = parsedBody.data;
 
     const user = await prisma.user.findUnique({ where: { clerkId: userId } });
     if (!user) return res.status(404).json({ error: 'User not found' });

@@ -3,7 +3,7 @@
 import StatsWidget from '@/components/StatsWidget';
 import TaskCard from '@/components/TaskCard';
 import Link from 'next/link';
-import { ArrowRight, Play, AlertTriangle } from 'lucide-react';
+import { ArrowRight, Play, AlertTriangle, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import Tilt from '@/components/Tilt';

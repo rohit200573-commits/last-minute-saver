@@ -8,6 +8,8 @@ import { motion, Variants } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import Tilt from '@/components/Tilt';
 import CreateTaskModal from '@/components/CreateTaskModal';
+import SkeletonLoader from '@/components/SkeletonLoader';
+import XpParticles from '@/components/XpParticles';
 
 const FocusCoach3D = dynamic(() => import('@/components/FocusCoach3D'), { ssr: false });
 import Safe3D from '@/components/Safe3D';
@@ -34,6 +36,7 @@ export default function Dashboard() {
   const { getToken } = useAuth();
   const [user, setUser] = useState({ level: 1, xp: 0, nextLevelXp: 100, streak: 0 });
   const [tasks, setTasks] = useState<any[]>([]);
+  const [xpTrigger, setXpTrigger] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -73,7 +76,10 @@ export default function Dashboard() {
         method: 'PATCH',
         body: JSON.stringify({ status: newStatus })
       });
-      if (newStatus === 'COMPLETED') toast.success('Task completed! XP Earned.');
+      if (newStatus === 'COMPLETED') {
+        toast.success('Task completed! +50 XP');
+        setXpTrigger(prev => prev + 1);
+      }
       else toast.success(`Task status updated to ${newStatus}`);
     } catch (err) {
       console.error('Failed to update status', err);
@@ -97,6 +103,8 @@ export default function Dashboard() {
       animate="show"
       className="max-w-6xl mx-auto p-6 md:p-10 space-y-10"
     >
+      <XpParticles amount={50} trigger={xpTrigger} />
+      
       {/* Emergency Rescue Mode Alert */}
       {urgentTask && (
         <motion.div variants={item} className="relative overflow-hidden bg-danger/10 border border-danger/30 backdrop-blur-2xl rounded-3xl p-6 flex items-start gap-4 shadow-[0_0_40px_rgba(255,82,82,0.2)] animate-pulse">
@@ -158,7 +166,7 @@ export default function Dashboard() {
           
           <div className="space-y-4">
             {loading ? (
-              <div className="text-white">Loading tasks...</div>
+              <SkeletonLoader count={3} />
             ) : (
               <div className="flex-1 space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar pb-10">
               {tasks.length === 0 && !loading ? (

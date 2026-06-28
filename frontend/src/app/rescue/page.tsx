@@ -6,7 +6,7 @@ import { fetchWithAuth } from '@/lib/api';
 import toast from 'react-hot-toast';
 import TaskCard from '@/components/TaskCard';
 import Link from 'next/link';
-import { ArrowLeft, AlertOctagon, Clock, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, AlertOctagon, Clock, ShieldAlert, Download } from 'lucide-react';
 import { motion, Variants } from 'framer-motion';
 import Tilt from '@/components/Tilt';
 
@@ -65,6 +65,46 @@ export default function RescueMode() {
     }
   };
 
+  const exportReport = () => {
+    if (tasks.length === 0) {
+      toast.error('No tasks to export');
+      return;
+    }
+    
+    const now = new Date().toLocaleString();
+    let reportText = `🚨 EMERGENCY RESCUE REPORT 🚨\nGenerated: ${now}\n\n`;
+    
+    const urgent = sortedTasks.find(t => t.status !== 'COMPLETED');
+    if (urgent) {
+      reportText += `🔥 URGENT FOCUS TASK 🔥\n`;
+      reportText += `Title: ${urgent.title}\n`;
+      reportText += `Priority: ${urgent.priority}\n`;
+      reportText += `Deadline: ${urgent.deadline?.date ? new Date(urgent.deadline.date).toLocaleString() : 'N/A'}\n\n`;
+    }
+
+    reportText += `🔒 LOCKED TASKS (To do later) 🔒\n`;
+    const locked = sortedTasks.filter(t => t.id !== urgent?.id);
+    if (locked.length === 0) {
+      reportText += `None.\n`;
+    } else {
+      locked.forEach((t, i) => {
+        reportText += `${i + 1}. [${t.status}] ${t.title} (Priority: ${t.priority})\n`;
+      });
+    }
+
+    const blob = new Blob([reportText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Rescue-Report-${new Date().getTime()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast.success('Report downloaded successfully!');
+  };
+
   // Sort tasks by urgency (deadline closest to now, then priority)
   const priorityWeight = { CRITICAL: 4, HIGH: 3, MEDIUM: 2, LOW: 1 };
   
@@ -113,8 +153,16 @@ export default function RescueMode() {
         <Link href="/dashboard" className="text-zinc-400 hover:text-white flex items-center gap-2 transition-colors">
           <ArrowLeft className="w-5 h-5" /> Back to Dashboard
         </Link>
-        <div className="flex items-center gap-2 text-danger font-bold tracking-widest uppercase text-sm border border-danger/30 bg-danger/10 px-4 py-1.5 rounded-full shadow-[0_0_15px_rgba(255,82,82,0.4)]">
-          <ShieldAlert className="w-4 h-4" /> Rescue Mode Active
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={exportReport}
+            className="flex items-center gap-2 text-zinc-400 hover:text-white font-bold tracking-widest uppercase text-sm border border-white/10 bg-white/5 px-4 py-1.5 rounded-full transition-colors"
+          >
+            <Download className="w-4 h-4" /> Export Report
+          </button>
+          <div className="flex items-center gap-2 text-danger font-bold tracking-widest uppercase text-sm border border-danger/30 bg-danger/10 px-4 py-1.5 rounded-full shadow-[0_0_15px_rgba(255,82,82,0.4)]">
+            <ShieldAlert className="w-4 h-4" /> Rescue Mode Active
+          </div>
         </div>
       </header>
 

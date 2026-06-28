@@ -62,7 +62,7 @@ export default function LandingPage() {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="text-xl md:text-2xl text-zinc-400 mb-10 max-w-2xl leading-relaxed"
         >
-          We provide cutting-edge AI tools to optimize your workflow, automate planning, and eliminate missed deadlines.
+          We don't just manage tasks — we defeat procrastination with AI and urgency engineering.
         </motion.p>
         
         <motion.div

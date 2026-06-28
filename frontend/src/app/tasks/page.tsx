@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { fetchWithAuth } from '@/lib/api';
 import CreateTaskModal from '@/components/CreateTaskModal';
+import SkeletonLoader from '@/components/SkeletonLoader';
 import toast from 'react-hot-toast';
 
 const TasksBackground3D = dynamic(() => import('@/components/TasksBackground3D'), { ssr: false });
@@ -108,8 +109,8 @@ export default function TasksPage() {
 
         <motion.div variants={item} className="space-y-6">
           {loading ? (
-            <div className="flex justify-center items-center py-20 text-white gap-2">
-              <Loader2 className="w-6 h-6 animate-spin" /> Loading tasks...
+            <div className="py-10">
+              <SkeletonLoader count={4} />
             </div>
           ) : tasks.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-16 text-center bg-white/[0.02] border border-white/5 rounded-3xl backdrop-blur-sm shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">

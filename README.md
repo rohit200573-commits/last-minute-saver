@@ -21,7 +21,7 @@
 - **AI Integration**: `@google/genai` (Gemini).
 
 ## Live Demo
-Check out the live deployment here: **[Live Demo on Vercel](#)** *(Replace with your Vercel URL)*
+Check out the live deployment here: https://last-minute-saver-mh1fa3awn-rohit200573-commits-projects.vercel.app/
 
 ## Getting Started
 

@@ -213,8 +213,8 @@ function GPUParticles({ count = 5000, color = "#00D4FF" }) {
   return (
     <points ref={meshRef}>
       <bufferGeometry>
-        <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
-        <bufferAttribute attach="attributes-aRandom" count={count} array={randoms} itemSize={1} />
+        <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} args={[positions, 3]} />
+        <bufferAttribute attach="attributes-aRandom" count={count} array={randoms} itemSize={1} args={[randoms, 1]} />
       </bufferGeometry>
       <shaderMaterial 
         ref={materialRef}

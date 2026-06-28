@@ -10,6 +10,7 @@ const Scene = dynamic(() => import('@/components/Scene'), { ssr: false });
 const FocusCoach3D = dynamic(() => import('@/components/FocusCoach3D'), { ssr: false });
 const ProductivityTwin3D = dynamic(() => import('@/components/ProductivityTwin3D'), { ssr: false });
 const TasksBackground3D = dynamic(() => import('@/components/TasksBackground3D'), { ssr: false });
+import Safe3D from '@/components/Safe3D';
 
 import { useState, useEffect } from 'react';
 
@@ -29,7 +30,11 @@ export default function LandingPage() {
     <div className="relative min-h-screen bg-background text-white overflow-x-hidden">
       
       {/* 3D Background - Disabled on mobile for performance */}
-      {!isMobile && <Scene />}
+      {!isMobile && (
+        <Safe3D>
+          <Scene />
+        </Safe3D>
+      )}
 
       {/* Vertical Animated Grid Ribbons (Hero Background) */}
       <div className="absolute inset-0 z-0 pointer-events-none flex justify-center opacity-20">
@@ -58,6 +63,15 @@ export default function LandingPage() {
         >
           We provide cutting-edge AI tools to optimize your workflow, automate planning, and eliminate missed deadlines.
         </motion.p>
+        
+        <motion.div
+          initial={{ opacity: 0, y: 30, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 1, delay: 0.7 }}
+          className="w-full max-w-4xl mx-auto mb-10 rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_50px_rgba(109,93,252,0.2)]"
+        >
+          <img src="/dashboard_mockup.png" alt="Dashboard Mockup" className="w-full h-auto object-cover opacity-90 hover:opacity-100 transition-opacity" />
+        </motion.div>
 
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -68,9 +82,16 @@ export default function LandingPage() {
           <Link href="/dashboard" className="px-8 py-4 bg-white text-black hover:bg-zinc-200 rounded-full font-bold transition-all flex items-center justify-center gap-2 text-lg shadow-[0_0_40px_rgba(255,255,255,0.2)]">
             Get Started <ChevronRight className="w-5 h-5" />
           </Link>
-          <Link href="/dashboard" className="px-8 py-4 bg-transparent border border-white/20 hover:bg-white/5 text-white rounded-full font-bold transition-all flex items-center justify-center gap-2 text-lg backdrop-blur-sm">
-            Learn More
-          </Link>
+          <button 
+            onClick={() => {
+              document.cookie = "demo_mode=true; path=/";
+              localStorage.setItem('demo_mode', 'true');
+              window.location.href = '/dashboard';
+            }}
+            className="px-8 py-4 bg-transparent border border-white/20 hover:bg-white/5 text-white rounded-full font-bold transition-all flex items-center justify-center gap-2 text-lg backdrop-blur-sm"
+          >
+            Try Public Demo
+          </button>
         </motion.div>
       </section>
 
@@ -104,7 +125,9 @@ export default function LandingPage() {
               transition={{ duration: 0.8 }}
               className="h-[400px] w-full relative rounded-3xl border border-white/10 bg-white/5 overflow-hidden"
             >
-              <ProductivityTwin3D />
+              <Safe3D>
+                <ProductivityTwin3D />
+              </Safe3D>
             </motion.div>
           </div>
 
@@ -119,7 +142,9 @@ export default function LandingPage() {
             >
               {/* We reuse TasksBackground3D but inside a relative container */}
               <div className="absolute inset-0">
-                <TasksBackground3D />
+                <Safe3D>
+                  <TasksBackground3D />
+                </Safe3D>
               </div>
             </motion.div>
             <motion.div 
@@ -165,7 +190,9 @@ export default function LandingPage() {
               className="h-[400px] w-full relative rounded-3xl border border-white/10 bg-white/5 overflow-hidden flex items-center justify-center"
             >
               <div className="w-[80%] h-[80%]">
-                 <FocusCoach3D />
+                 <Safe3D>
+                   <FocusCoach3D />
+                 </Safe3D>
               </div>
             </motion.div>
           </div>

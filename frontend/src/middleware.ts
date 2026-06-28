@@ -8,7 +8,10 @@ const isProtectedRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-  if (isProtectedRoute(req)) {
+  // Public Demo Mode Bypass
+  const isDemo = req.cookies.get('demo_mode')?.value === 'true';
+  
+  if (!isDemo && isProtectedRoute(req)) {
     const session = await auth();
     if (!session.userId) {
       return session.redirectToSignIn();

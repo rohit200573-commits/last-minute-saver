@@ -10,6 +10,7 @@ import Tilt from '@/components/Tilt';
 import CreateTaskModal from '@/components/CreateTaskModal';
 
 const FocusCoach3D = dynamic(() => import('@/components/FocusCoach3D'), { ssr: false });
+import Safe3D from '@/components/Safe3D';
 
 const container: Variants = {
   hidden: { opacity: 0 },
@@ -191,7 +192,9 @@ export default function Dashboard() {
               <div className="relative z-10 flex-1 flex flex-col">
                 <div className="h-48 w-full rounded-2xl bg-black/20 border border-white/5 mb-6 overflow-hidden flex items-center justify-center shadow-inner">
                   <div className="w-[120%] h-[120%]">
-                    <FocusCoach3D />
+                    <Safe3D>
+                      <FocusCoach3D />
+                    </Safe3D>
                   </div>
                 </div>
                 <h3 className="font-bold text-2xl tracking-tight text-white mb-3">AI Focus Coach</h3>

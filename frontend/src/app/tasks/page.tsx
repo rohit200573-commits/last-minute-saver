@@ -11,6 +11,7 @@ import CreateTaskModal from '@/components/CreateTaskModal';
 import toast from 'react-hot-toast';
 
 const TasksBackground3D = dynamic(() => import('@/components/TasksBackground3D'), { ssr: false });
+import Safe3D from '@/components/Safe3D';
 
 const container: Variants = {
   hidden: { opacity: 0 },
@@ -69,7 +70,9 @@ export default function TasksPage() {
     <div className="relative min-h-screen bg-[#050505] overflow-x-hidden">
       {/* Lower opacity background so it doesn't distract from the tasks */}
       <div className="absolute inset-0 z-0 opacity-30">
-        <TasksBackground3D />
+        <Safe3D>
+          <TasksBackground3D />
+        </Safe3D>
       </div>
       
       <motion.div 

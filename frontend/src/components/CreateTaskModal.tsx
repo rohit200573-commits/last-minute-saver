@@ -39,9 +39,15 @@ export default function CreateTaskModal({ onTaskCreated }: { onTaskCreated: () =
     };
 
     recognition.onerror = (event: any) => {
-      console.error(event.error);
+      console.error('Speech recognition error:', event.error);
       setIsListening(false);
-      toast.error('Voice recognition failed.');
+      if (event.error === 'network') {
+        toast.error('Network error. Speech recognition may require HTTPS or an active internet connection.');
+      } else if (event.error === 'not-allowed') {
+        toast.error('Microphone access denied. Please allow microphone permissions.');
+      } else {
+        toast.error(`Voice recognition failed: ${event.error}`);
+      }
     };
 
     recognition.onend = () => {

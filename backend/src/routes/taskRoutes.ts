@@ -96,22 +96,30 @@ router.post('/', async (req: Request, res: Response) => {
       }
     }
 
+    const taskData: any = {
+      title,
+      description,
+      priority,
+      userId: user.id
+    };
+
+    if (deadline) {
+      taskData.deadline = {
+        create: {
+          date: new Date(deadline),
+          isUrgent: priority === 'CRITICAL'
+        }
+      };
+    }
+
+    if (subTasksToCreate.length > 0) {
+      taskData.subTasks = {
+        create: subTasksToCreate
+      };
+    }
+
     const task = await prisma.task.create({
-      data: {
-        title,
-        description,
-        priority,
-        userId: user.id,
-        deadline: deadline ? {
-          create: {
-            date: new Date(deadline),
-            isUrgent: priority === 'CRITICAL'
-          }
-        } : undefined,
-        subTasks: subTasksToCreate.length > 0 ? {
-          create: subTasksToCreate
-        } : undefined
-      },
+      data: taskData,
       include: { subTasks: true, deadline: true }
     });
     res.status(201).json(task);
@@ -128,7 +136,7 @@ router.patch('/:id/status', async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const { id } = req.params;
+    const id = req.params.id as string;
     
     const statusSchema = z.object({
       status: z.enum(['PENDING', 'IN_PROGRESS', 'COMPLETED'])

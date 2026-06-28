@@ -47,10 +47,7 @@ export default function Navbar() {
 
       <div className="hidden md:flex items-center gap-4">
         <Show when="signed-in">
-          <div className="flex flex-col items-end">
-            <span className="text-sm font-semibold text-zinc-900 dark:text-white">Level 12</span>
-            <span className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">350 / 500 XP</span>
-          </div>
+
           <UserButton appearance={{ elements: { userButtonAvatarBox: "w-10 h-10" } }} />
         </Show>
         <Show when="signed-out">

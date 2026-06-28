@@ -4,14 +4,14 @@ import StatsWidget from '@/components/StatsWidget';
 import TaskCard from '@/components/TaskCard';
 import Link from 'next/link';
 import { ArrowRight, Play, AlertTriangle, Sparkles } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import Tilt from '@/components/Tilt';
 import CreateTaskModal from '@/components/CreateTaskModal';
 
 const FocusCoach3D = dynamic(() => import('@/components/FocusCoach3D'), { ssr: false });
 
-const container = {
+const container: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -19,7 +19,7 @@ const container = {
   }
 };
 
-const item = {
+const item: Variants = {
   hidden: { opacity: 0, y: 20 },
   show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
 };

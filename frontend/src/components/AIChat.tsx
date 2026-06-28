@@ -11,6 +11,7 @@ export default function AIChat() {
   const [messages, setMessages] = useState<{role: 'user' | 'ai', text: string}[]>([
     { role: 'ai', text: 'Hi! I am your AI Copilot. How can I help you crush your deadlines today?' }
   ]);
+  const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const { getToken } = useAuth();
 

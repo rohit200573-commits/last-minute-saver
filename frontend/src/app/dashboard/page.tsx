@@ -27,6 +27,7 @@ const item = {
 import { useState, useEffect } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { fetchWithAuth } from '@/lib/api';
+import toast from 'react-hot-toast';
 
 export default function Dashboard() {
   const { getToken } = useAuth();
@@ -60,6 +61,10 @@ export default function Dashboard() {
   }, [getToken]);
 
   const handleStatusChange = async (id: string, newStatus: string) => {
+    if (newStatus === 'COMPLETED') {
+      const confirm = window.confirm("Are you sure you want to mark this task as completed?");
+      if (!confirm) return;
+    }
     try {
       // Optimistic update
       setTasks(current => current.map(t => t.id === id ? { ...t, status: newStatus } : t));
@@ -67,8 +72,11 @@ export default function Dashboard() {
         method: 'PATCH',
         body: JSON.stringify({ status: newStatus })
       });
+      if (newStatus === 'COMPLETED') toast.success('Task completed! XP Earned.');
+      else toast.success(`Task status updated to ${newStatus}`);
     } catch (err) {
       console.error('Failed to update status', err);
+      toast.error('Failed to update task status');
       // Revert on failure by reloading
       const tasksData = await fetchWithAuth('/tasks', getToken);
       setTasks(tasksData);

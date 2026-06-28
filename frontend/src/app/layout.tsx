@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 import AIChat from '@/components/AIChat';
+import { Toaster } from 'react-hot-toast';
 
 import { ClerkProvider } from '@clerk/nextjs'
 
@@ -42,6 +43,7 @@ export default function RootLayout({
               {children}
             </main>
             <AIChat />
+            <Toaster position="bottom-right" toastOptions={{ style: { background: '#18181b', color: '#fff', border: '1px solid #27272a' } }} />
           </SmoothScroll>
         </body>
       </html>

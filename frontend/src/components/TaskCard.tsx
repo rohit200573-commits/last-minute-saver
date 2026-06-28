@@ -59,7 +59,7 @@ export default function TaskCard({ id, title, description, priority, status, cre
       <div className={`p-5 rounded-2xl border transition-all duration-300 ${disabled ? 'opacity-50 grayscale pointer-events-none' : ''} ${status === 'COMPLETED' ? 'opacity-60 bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800' : 'bg-white/5 backdrop-blur-xl border-white/10 shadow-[0_4px_15px_0_rgba(0,0,0,0.1)] hover:shadow-[0_8px_30px_0_rgba(0,0,0,0.2)]'}`}>
         <div className="flex items-start justify-between gap-4" style={{ transform: "translateZ(30px)" }}>
           <div className="flex items-start gap-3">
-            <button onClick={cycleStatus} className="mt-0.5 hover:scale-110 transition-transform cursor-pointer disabled:cursor-not-allowed" disabled={disabled}>
+            <button aria-label={`Mark task as ${status === 'PENDING' ? 'In Progress' : status === 'IN_PROGRESS' ? 'Completed' : 'Pending'}`} onClick={cycleStatus} className="mt-0.5 hover:scale-110 transition-transform cursor-pointer disabled:cursor-not-allowed" disabled={disabled}>
               {statusIcons[status]}
             </button>
             <div>

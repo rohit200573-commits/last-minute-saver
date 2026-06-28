@@ -11,6 +11,7 @@ const FocusCoach3D = dynamic(() => import('@/components/FocusCoach3D'), { ssr: f
 const ProductivityTwin3D = dynamic(() => import('@/components/ProductivityTwin3D'), { ssr: false });
 const TasksBackground3D = dynamic(() => import('@/components/TasksBackground3D'), { ssr: false });
 import Safe3D from '@/components/Safe3D';
+import EmergencyRescueGraphic from '@/components/EmergencyRescueGraphic';
 
 import { useState, useEffect } from 'react';
 
@@ -140,11 +141,8 @@ export default function LandingPage() {
               transition={{ duration: 0.8 }}
               className="h-[400px] w-full relative rounded-3xl border border-white/10 bg-white/5 overflow-hidden order-2 md:order-1"
             >
-              {/* We reuse TasksBackground3D but inside a relative container */}
               <div className="absolute inset-0">
-                <Safe3D>
-                  <TasksBackground3D />
-                </Safe3D>
+                <EmergencyRescueGraphic />
               </div>
             </motion.div>
             <motion.div 

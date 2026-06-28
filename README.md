@@ -25,7 +25,10 @@ Want to test the app without signing up? We've built a robust **Public Demo Mode
 - **Authentication**: Clerk (with custom middleware bypass for Demo Mode).
 - **AI Integration**: Google Gemini API.
 
-## 🚀 Getting Started Locally
+## Live Demo
+Check out the live deployment here: https://last-minute-saver-mh1fa3awn-rohit200573-commits-projects.vercel.app/
+
+## Getting Started
 
 ### Prerequisites
 - Node.js (v18+)
